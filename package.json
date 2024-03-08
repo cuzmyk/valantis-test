@@ -1,6 +1,7 @@
 {
   "name": "valantis-test",
   "version": "0.1.0",
+  "homepage": "https://cuzmyk.github.io/valantis-test",
   "private": true,
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
