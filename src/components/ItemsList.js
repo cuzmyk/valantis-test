@@ -14,28 +14,26 @@ const ItemsList = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [params, setParams] = useState({});
   const [totalPages, setTotalPages] = useState(0);
+  const [load, setLoad] = useState(false);
+
+  const getUniqueArray = (array) => {
+    return [...new Set(array)];
+  };
 
   const { data: brands } = useGetFieldsQuery({ field: "brand" });
-  function getUniqueArray(array) {
-    return [...new Set(array)];
-  }
   const uniqueBrands = getUniqueArray(brands);
 
-  const {
-    data: ids,
-    error: idsError,
-    isLoading: idsLoading,
-  } = useGetIdsQuery({ limit: 50, offset: 50 * currentPage });
+  const { data: ids, isLoading: idsLoading } = useGetIdsQuery({
+    limit: 50,
+    offset: 50 * currentPage,
+  });
 
   const hasParams = Object.keys(params).length > 0;
 
-  const {
-    data: filteredIds,
-    error: filteredIdsError,
-    isLoading: filteredIdsLoading,
-  } = useGetFilteredItemsQuery(params, {
-    skip: !hasParams,
-  });
+  const { data: filteredIds, isLoading: filteredIdsLoading } =
+    useGetFilteredItemsQuery(params, {
+      skip: !hasParams,
+    });
 
   const idsToFetch = useMemo(() => {
     if (filteredIds && hasParams) {
@@ -44,20 +42,29 @@ const ItemsList = () => {
     return ids;
   }, [filteredIds, ids, currentPage, hasParams]);
 
-  const {
-    data,
-    error: dataError,
-    isLoading: itemsLoading,
-  } = useGetItemsQuery(
+  const { data, isLoading: itemsLoading } = useGetItemsQuery(
     { ids: getUniqueArray(idsToFetch) },
     { skip: !idsToFetch }
   );
 
   useEffect(() => {
     setTotalPages(
-      filteredIds?.length ? Math.floor(filteredIds?.length / 50) : 161
+      filteredIds?.length && hasParams
+        ? Math.floor(filteredIds?.length / 50)
+        : 161
     );
-  }, [data, params, filteredIds]);
+  }, [data, hasParams, filteredIds]);
+
+  useEffect(() => {
+    if (idsToFetch) {
+      setLoad(true);
+    }
+  }, [idsToFetch]);
+  useEffect(() => {
+    if (data) {
+      setLoad(false);
+    }
+  }, [data]);
 
   const updateParams = (key, value) => {
     setCurrentPage(0);
@@ -88,6 +95,7 @@ const ItemsList = () => {
   const resetFilters = () => {
     setCurrentPage(0);
     setParams({});
+    setLoad(true);
   };
 
   return (
@@ -121,8 +129,7 @@ const ItemsList = () => {
           Сбросить фильтры
         </Button>
       </Flex>
-      {(idsLoading && itemsLoading && filteredIdsLoading) ||
-      (idsToFetch?.length && !data?.length) ? (
+      {idsLoading || itemsLoading || filteredIdsLoading || load ? (
         <Text textAlign={"center"}>загрузка</Text>
       ) : (
         <>
@@ -144,7 +151,7 @@ const ItemsList = () => {
               ))
             )}
           </Grid>
-          {idsToFetch?.length > 0 && (
+          {idsToFetch?.length > 0 && !load && (
             <Pagination
               totalPages={totalPages}
               currentPage={currentPage}

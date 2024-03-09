@@ -29,7 +29,9 @@ export const api = createApi({
           action: "get_ids",
           params,
         },
+        providesTags: ["ids"],
       }),
+
       transformResponse: (response) => response.result,
       transformErrorResponse: (response, meta, arg) => {
         console.error(
@@ -39,6 +41,7 @@ export const api = createApi({
         return response.data.error || "Неизвестная ошибка";
       },
       retry: true,
+      retryOn: (failureCount, error) => true,
     }),
     getItems: builder.query({
       query: (params) => ({
@@ -48,6 +51,7 @@ export const api = createApi({
           action: "get_items",
           params,
         },
+        invalidatesTags: ["ids", "filteredIds"],
       }),
       transformResponse: (response) => response.result,
       transformErrorResponse: (response, meta, arg) => {
@@ -59,6 +63,7 @@ export const api = createApi({
       },
 
       retry: true,
+      retryOn: (failureCount, error) => true,
     }),
     getFilteredItems: builder.query({
       query: (params) => ({
@@ -68,6 +73,7 @@ export const api = createApi({
           action: "filter",
           params,
         },
+        providesTags: ["filteredIds"],
       }),
       transformResponse: (response) => response.result,
       transformErrorResponse: (response, meta, arg) => {
@@ -79,6 +85,7 @@ export const api = createApi({
       },
 
       retry: true,
+      retryOn: (failureCount, error) => true,
     }),
     getFields: builder.query({
       query: (params) => ({
@@ -98,6 +105,7 @@ export const api = createApi({
         return response.data.error || "Неизвестная ошибка";
       },
       retry: true,
+      retryOn: (failureCount, error) => true,
     }),
   }),
 });

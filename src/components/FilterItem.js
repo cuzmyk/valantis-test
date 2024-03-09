@@ -35,9 +35,6 @@ const FilterItem = ({
             {search ? search : "Выбрать бренд"}
           </MenuButton>
           <MenuList maxH="190px" overflowY="scroll">
-            <MenuItem color={"red.600"} onClick={() => handleSearch("")}>
-              Показать все
-            </MenuItem>
             {uniqueBrands.sort().map((brand, index) => (
               <MenuItem key={index} onClick={() => handleSearch(brand)}>
                 {brand ? brand : "Без бренда"}
