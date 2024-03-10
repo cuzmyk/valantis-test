@@ -8,10 +8,8 @@ const Pagination = ({ totalPages, currentPage, setCurrentPage }) => {
   useEffect(() => {
     const calculatePages = () => {
       if (currentPage < 3) {
-        // Если мы находимся в начале, показываем первые пять страниц
         setPages([0, 1, 2, 3, 4].slice(0, Math.min(5, totalPages + 1)));
       } else if (currentPage > totalPages - 2) {
-        // Если мы находимся в конце, показываем последние пять страниц
         setPages(
           [
             totalPages - 4,
@@ -22,7 +20,6 @@ const Pagination = ({ totalPages, currentPage, setCurrentPage }) => {
           ].filter((page) => page <= totalPages)
         );
       } else {
-        // В противном случае, показываем текущую страницу и две соседние
         setPages([
           currentPage - 2,
           currentPage - 1,
